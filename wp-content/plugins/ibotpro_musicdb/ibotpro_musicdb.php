@@ -17,6 +17,7 @@ define('IBOTPRO_MUSICDB_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IBOTPRO_MUSICDB_ARTISTS_TABLE', 'ibotpro_musicdb_artists');
 define('IBOTPRO_MUSICDB_ALBUMS_TABLE', 'ibotpro_musicdb_albums');
 define('IBOTPRO_MUSICDB_SONGS_TABLE', 'ibotpro_musicdb_songs');
+define('IBOTPRO_MUSICDB_CATEGORIES_TABLE', 'ibotpro_musicdb_categories');
 			
 if (!class_exists('ibotpro_musicdb')){
 	class ibotpro_musicdb{
@@ -50,6 +51,7 @@ if (!class_exists('ibotpro_musicdb')){
 			if ($wpdb->get_var('SHOW TABLES LIKE "' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . '"') != $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE) {
 				$sql = 'CREATE TABLE ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . ' (
 					id MEDIUMINT(9) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+					artistID MEDIUMINT(9) NOT NULL,
 					name VARCHAR(255) NOT NULL,
 					createDate datetime DEFAULT "0000-00-00 00:00:00" NOT NULL,
 					editDate datetime DEFAULT "0000-00-00 00:00:00" NOT NULL,
@@ -57,10 +59,11 @@ if (!class_exists('ibotpro_musicdb')){
 				
 				dbDelta($sql);
 				
+				$example_artist_id = "1";
 				$example_album_name = "The Heat";
 				$example_album_approved = "1";
 				
-				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, array( 'name' => $example_album_name, 'approved' => $example_album_approved ) );
+				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, array( 'artistID' => $example_artist_id, 'name' => $example_album_name, 'approved' => $example_album_approved ) );
 			}
 			
 			if ($wpdb->get_var('SHOW TABLES LIKE "' . $wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE . '"') != $wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE) {
@@ -77,6 +80,18 @@ if (!class_exists('ibotpro_musicdb')){
 				$example_song_approved = "1";
 				
 				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE, array( 'name' => $example_song_name, 'approved' => $example_song_approved ) );
+			}
+			
+			if ($wpdb->get_var('SHOW TABLES LIKE "' . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . '"') != $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE) {
+				$sql = 'CREATE TABLE ' . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . ' (
+					id MEDIUMINT(9) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+					name VARCHAR(255) NOT NULL)';
+				
+				dbDelta($sql);
+				
+				$example_category_name = "Rock";
+				
+				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE, array( 'name' => $example_category_name ) );
 			}
 			
 			// add new role
@@ -101,6 +116,7 @@ if (!class_exists('ibotpro_musicdb')){
 			$wpdb->query("DROP TABLE IF EXISTS " . $wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE . "");
 			$wpdb->query("DROP TABLE IF EXISTS " . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . "");
 			$wpdb->query("DROP TABLE IF EXISTS " . $wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE . "");
+			$wpdb->query("DROP TABLE IF EXISTS " . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . "");
 
 			delete_option( "ibotpro_music_db_version" );
 		}
@@ -113,6 +129,8 @@ if (!class_exists('ibotpro_musicdb')){
 				include('inc/ibotpro_musicdb_manage_songs.php');
 			} elseif (($_REQUEST['action'] == "manage_categories") || ($_REQUEST['action'] == "edit_category") || ($_REQUEST['action'] == "delete_category") || ($_REQUEST['action'] == "add_category")) {
 				include('inc/ibotpro_musicdb_manage_categories.php');
+			} elseif (($_REQUEST['action'] == "manage_albums") || ($_REQUEST['action'] == "edit_album") || ($_REQUEST['action'] == "delete_album") || ($_REQUEST['action'] == "add_album")) {
+				include('inc/ibotpro_musicdb_manage_albums.php');
 			} else {
 				include('inc/ibotpro_musicdb_manage_artists.php');
 			}
