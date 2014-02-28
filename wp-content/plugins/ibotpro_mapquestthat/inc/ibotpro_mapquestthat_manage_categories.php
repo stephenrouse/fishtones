@@ -14,7 +14,7 @@
 	</style>
 	<div class="wrap">
 <?php
-	if (($_POST['mapquestthat_action'] || $_REQUEST['action']) && ($_REQUEST['action'] != "manage_categories")) {
+	if ($_POST['mapquestthat_action'] || $_REQUEST['action']) {
 		if ($_POST['mapquestthat_action'] == 'add_category') {
 			//Form data sent  
 			$title = $_POST['mapquestthat_category_title']; 
