@@ -2,6 +2,7 @@
 	define('IBOTPRO_MUSICDB_ARTISTS_TABLE', 'ibotpro_musicdb_artists');
 	define('IBOTPRO_MUSICDB_ALBUMS_TABLE', 'ibotpro_musicdb_albums');
 	define('IBOTPRO_MUSICDB_SONGS_TABLE', 'ibotpro_musicdb_songs');
+	define('IBOTPRO_MUSICDB_CATEGORY_TABLE', 'ibotpro_musicdb_categories');
 	
 	global $wpdb;
 	
@@ -159,7 +160,9 @@
 						<?php echo $artist->name; ?>
 						<div class="row-actions">
 							<span class="edit"><a title="Edit &quot;<?php echo $artist->name;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=edit_artist&amp;artistID=<?php echo $artist->id; ?>">Edit</a> | </span>
+							<span class="add_album"><a title="Manage Albums for &quot;<?php echo $artist->name;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=manage_albums&amp;artistID=<?php echo $artist->id; ?>">Manage Albums</a> | </span>
 							<span class="trash"><a title="Move &quot;<?php echo $artist->name;?>&quot; to the Trash" href="admin.php?page=ibotpro_musicdb.php&amp;action=delete_artist&amp;artistID=<?php echo $artist->id; ?>" class="submitdelete">Trash</a>
+							<span class="view"><a rel="permalink" title="View &quot;<?php echo $map->title;?>&quot;" href="<? echo site_url(); ?>/map?mapID=<?php echo $map->id;?>" target="_blank">View</a></span>
 						</div>
 					</td>
 				</tr>

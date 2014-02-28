@@ -2,7 +2,8 @@
 	define('IBOTPRO_MUSICDB_ARTISTS_TABLE', 'ibotpro_musicdb_artists');
 	define('IBOTPRO_MUSICDB_ALBUMS_TABLE', 'ibotpro_musicdb_albums');
 	define('IBOTPRO_MUSICDB_SONGS_TABLE', 'ibotpro_musicdb_songs');
-	
+	define('IBOTPRO_MUSICDB_CATEGORIES_TABLE', 'ibotpro_musicdb_categories');
+
 	global $wpdb;
 	
 	if (!empty($_REQUEST['action'])) {
@@ -11,108 +12,88 @@
 ?>
 	<style>
 	.id{width:20px;}
-	ul.artists{overflow:hidden;width:300px;}
-	ul.artists .artist{float:left;text-align:center;}
+	ul.categories{overflow:hidden;width:300px;}
+	ul.categories .category{float:left;text-align:center;}
 	</style>
 	<div class="wrap">
 <?php
-	if ($_POST['musicdb_action'] || $_REQUEST['action']) {
-		if ($_POST['musicdb_action'] == 'add_map') {
+	if (($_POST['musicdb_action'] || $_REQUEST['action']) && ($_REQUEST['action'] != "manage_albums")) {
+		if ($_POST['musicdb_action'] == 'add_album') {
 			//Form data sent  
-			$title = $_POST['musicdb_map_title']; 
-			$rolloverContent = $_POST['musicdb_map_rolloverContent']; 
-			$infoContent = $_POST['musicdb_map_infoContent']; 
-			$latitude = $_POST['musicdb_map_latitude']; 
-			$longitude = $_POST['musicdb_map_longitude'];
-			$artistID = $_POST['musicdb_map_artistID'];
-			if (isset($_POST['musicdb_map_active'])) {
+			$name = $_POST['musicdb_album_name']; 
+			$categoryID = $_POST['musicdb_album_categoryID'];
+			if (isset($_POST['musicdb_album_active'])) {
 				$active = 1;
 			}else{
 				$active = 0;
 			}
 	
 			$wpdb->insert( 
-				$wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE, 
+				$wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, 
 				array( 
-					'title' => stripslashes($title), 
-					'rolloverContent' => stripslashes($rolloverContent), 
-					'infoContent' => stripslashes($infoContent), 
-					'latitude' => $latitude, 
-					'longitude' => $longitude, 
-					'artistID' => $artistID,
+					'name' => stripslashes($name), 
+					'categoryID' => $categoryID, 
 					'active' => $active
 				)
 			);
 	?>
-		<div class="updated"><p><strong><?php _e('Map saved.' ); ?></strong></p></div>  
+		<div class="updated"><p><strong><?php _e('Album saved.' ); ?></strong></p></div>  
 	<?php		
-		} elseif ($_POST['musicdb_action'] == "edit_map") {
+		} elseif ($_POST['musicdb_action'] == "edit_album") {
 			//Form data sent  
-			$title = $_POST['musicdb_map_title']; 
-			$rolloverContent = $_POST['musicdb_map_rolloverContent']; 
-			$infoContent = $_POST['musicdb_map_infoContent']; 
-			$latitude = $_POST['musicdb_map_latitude']; 
-			$longitude = $_POST['musicdb_map_longitude'];
-			$artistID = $_POST['musicdb_map_artistID'];
-			if (isset($_POST['musicdb_map_active'])) {
+			$name = $_POST['musicdb_album_name']; 
+			$categoryID = $_POST['musicdb_album_categoryID'];
+			if (isset($_POST['musicdb_album_active'])) {
 				$active = 1;
 			}else{
 				$active = 0;
 			}
-			$musicdb_mapID = $_POST['musicdb_mapID'];
+			$musicdb_albumID = $_POST['musicdb_albumID'];
 			
 			$wpdb->update( 
-				$wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE, 
+				$wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, 
 				array( 
-					'title' => stripslashes($title), 
-					'rolloverContent' => stripslashes($rolloverContent), 
-					'infoContent' => stripslashes($infoContent), 
-					'latitude' => $latitude, 
-					'longitude' => $longitude,
-					'artistID' => $artistID, 
+					'name' => stripslashes($name), 
+					'categoryID' => $categoryID,
 					'active' => $active
 				), 
-				array( 'id' => $musicdb_mapID )
+				array( 'id' => $musicdb_albumID )
 			);
 	?>
-		<div class="updated"><p><strong><?php _e('Map saved.' ); ?></strong></p></div>  
+		<div class="updated"><p><strong><?php _e('Album saved.' ); ?></strong></p></div>  
 	<?php
 		} else { 
-			//Edit map display  
-			$maps = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE . ' WHERE id='.$_REQUEST['mapID']); 
+			//Edit album display  
+			$albums = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . ' WHERE id='.$_REQUEST['albumID']); 
 			
-			$title = $maps[0]->title;
-			$rolloverContent = $maps[0]->rolloverContent;
-			$infoContent = $maps[0]->infoContent;
-			$latitude = $maps[0]->latitude;
-			$longitude = $maps[0]->longitude;
-			$artistID = $maps[0]->artistID;
-			$active = $maps[0]->active;
+			$name = $albums[0]->name;
+			$artistID = $albums[0]->artistID;
+			$categoryID = $albums[0]->categoryID;
+			$active = $albums[0]->active;
 			
-			if ($_POST['musicdb_action'] == "delete_map") {
+			if ($_POST['musicdb_action'] == "delete_album") {
 				//Form data sent  
-				$mapID = $_POST['musicdb_mapID'];
+				$albumID = $_POST['musicdb_albumID'];
 		
-				//echo "DELETE FROM " . $wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE . " WHERE id=" .$_POST['musicdb_mapID'];
-				$wpdb->query("DELETE FROM " . $wpdb->prefix . IBOTPRO_MUSICDB_POI_TABLE . " WHERE mapID=" .$_POST['musicdb_mapID']);
-				$wpdb->query("DELETE FROM " . $wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE . " WHERE id=" .$_POST['musicdb_mapID']);
+				//echo "DELETE FROM " . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . " WHERE id=" .$_POST['musicdb_albumID'];
+				$wpdb->query("DELETE FROM " . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . " WHERE id=" .$_POST['musicdb_albumID']);
 				?>  
-				<div class="updated"><p><strong><?php _e('Map deleted.' ); ?></strong></p></div>
-				<p><a href="admin.php?page=ibotpro_musicdb.php">Back to maps</a></p>
+				<div class="updated"><p><strong><?php _e('Album deleted.' ); ?></strong></p></div>
+				<p><a href="admin.php?page=ibotpro_musicdb.php&action=manage_albums&artistID=<?php echo $artistID ?>">Back to Albums</a></p>
 			<?php
-			} elseif ($_REQUEST['action'] == "delete_map") {
+			} elseif ($_REQUEST['action'] == "delete_album") {
 			?>
-				<h2><?php _e("Manage Maps", 'ibotpro_musicdb'); ?></h2>
+				<h2><?php _e("Manage Albums", 'ibotpro_musicdb'); ?></h2>
 	    		<div class="wrap"> 
-	    			<?php    echo "<h2>" . __( 'Delete Map', 'ibotpro_musicdb' ) . "</h2>"; ?>
-	    			<?php    echo "<p>" . __( 'You are about to delete ', 'ibotpro_musicdb' ) . $title . ".  Are you sure you want to delete this map and all it's POIs?</p>"; ?>
+	    			<?php    echo "<h2>" . __( 'Delete Album', 'ibotpro_musicdb' ) . "</h2>"; ?>
+	    			<?php    echo "<p>" . __( 'You are about to delete ', 'ibotpro_musicdb' ) . $name . ".  Are you sure you want to delete this Album?</p>"; ?>
 			        <form name="musicdb_form" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">  
 			            <input type="hidden" name="musicdb_action" value="<? echo $action ?>">
-			            <?php if (($action == 'edit_map') || ($action == 'delete_map')) { ?>
-			            <input type="hidden" name="musicdb_mapID" value="<? echo $_REQUEST['mapID'] ?>">
+			            <?php if (($action == 'edit_album') || ($action == 'delete_album')) { ?>
+			            <input type="hidden" name="musicdb_albumID" value="<? echo $_REQUEST['albumID'] ?>">
 			            <?php } ?>
 			            <p class="submit">  
-			            <input type="submit" name="Submit" value="<?php _e('Delete Map', 'ibotpro_musicdb' ) ?>" />  
+			            <input type="submit" name="Submit" value="<?php _e('Add/Edit Album', 'ibotpro_musicdb' ) ?>" />  
 			            </p>
 			        </form>
 	    		</div>
@@ -120,43 +101,38 @@
 			}
 		}
 		
-		if ($_REQUEST['action'] != "delete_map") {
+		if ($_REQUEST['action'] != "delete_album") {
 	?>
-			<h2><?php _e("Manage Maps", 'ibotpro_musicdb'); ?></h2>
+			<h2><?php _e("Manage Albums", 'ibotpro_musicdb'); ?></h2>
 		    <div class="wrap">  
-		        <?php    echo "<h2>" . __( 'Add/Edit Map', 'ibotpro_musicdb' ) . "</h2>"; ?>  
+		        <?php    echo "<h2>" . __( 'Add/Edit Album', 'ibotpro_musicdb' ) . "</h2>"; ?>  
 		      
 		        <form name="musicdb_form" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">  
 		            <input type="hidden" name="musicdb_action" value="<? echo $action ?>">
-		            <?php if ($action == 'edit_map') { ?>
-		            <input type="hidden" name="musicdb_mapID" value="<? echo $_REQUEST['mapID'] ?>">
+		            <?php if ($action == 'edit_album') { ?>
+		            <input type="hidden" name="musicdb_albumID" value="<? echo $_REQUEST['albumID'] ?>">
 		            <?php } ?>
-		            <?php    echo "<h4>" . __( 'Map Details', 'ibotpro_musicdb' ) . "</h4>"; ?>  
-		            <p><?php _e("Map Title: " ); ?><input type="text" name="musicdb_map_title" value="<?php echo stripslashes($title); ?>" size="20"><?php _e(" ex: My Favorite Place" ); ?></p>
-		            <p><?php _e("Rollover Content: " ); ?><textarea name="musicdb_map_rolloverContent" rows="5" cols="40"><?php echo stripslashes($rolloverContent); ?></textarea></p>
-		            <p><?php _e("Info Content: " ); ?><textarea name="musicdb_map_infoContent" rows="5" cols="40"><?php echo stripslashes($infoContent); ?></textarea></p>
-		            <p><?php _e("Latitude: " ); ?><input type="text" name="musicdb_map_latitude" value="<?php echo $latitude; ?>" size="20"></p>
-		            <p><?php _e("Longitude: " ); ?><input type="text" name="musicdb_map_longitude" value="<?php echo $longitude; ?>" size="20"></p>
-		            <p><?php _e("Lat/Long Finder: " ); ?><a href="http://developer.mapquest.com/web/tools/lat-long-finder" target="_blank"><img src="http://content.mqcdn.com/winston-148/cdn/dotcom3/images/icons/resolved/single.png"/></a></p>
+		            <?php    echo "<h4>" . __( 'Album Details', 'ibotpro_musicdb' ) . "</h4>"; ?>  
+		            <p><?php _e("Album Title: " ); ?><input type="text" name="musicdb_album_name" value="<?php echo stripslashes($name); ?>" size="20"><?php _e(" ex: My Favorite Place" ); ?></p>
 		            <p><?php _e("Category: " ); ?>
 		            <?php
-		            	$artists = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE . '.id ASC');
+		            	$categories = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . '.id ASC');
 		            	
-		            	if (!empty($artists)) {
+		            	if (!empty($categories)) {
 		            	?>
-		            	<ul class="artists">
+		            	<ul class="categories">
 		            	<?php
-		            		foreach($artists as $artist) {
-		            			$artist_checked = "";
-		            			if ($artist->id == $artistID) {
-		            				$artist_checked = " checked";
+		            		foreach($categories as $category) {
+		            			$category_checked = "";
+		            			if ($category->id == $categoryID) {
+		            				$category_checked = " checked";
 		            			}
 		            ?>
 		            	
-		            		<li class="artist">
-		            			<ul class="artist-details">
-		            				<li><img src="<?php echo $artist->imageURI; ?>"/></li>
-		            				<li><input type="radio" name="musicdb_map_artistID" value="<?php echo $artist->id; ?>"<?php echo $artist_checked ?>></li>
+		            		<li class="category">
+		            			<ul class="category-details">
+		            				<li><img src="<?php echo $category->imageURI; ?>"/></li>
+		            				<li><input type="radio" name="musicdb_album_categoryID" value="<?php echo $category->id; ?>"<?php echo $category_checked ?>></li>
 		            			</ul>
 		            		</li>
 		            <?php
@@ -167,23 +143,23 @@
 						}
 					?>
 		            </p>
-		            <p><?php _e("Active: " ); ?><input type="checkbox" name="musicdb_map_active" <?php if ($active == 1){ ?>checked<? } ?>></p>
+		            <p><?php _e("Active: " ); ?><input type="checkbox" name="musicdb_album_active" <?php if ($active == 1){ ?>checked<? } ?>></p>
 		            <p class="submit">  
 		            <input type="submit" name="Submit" value="<?php _e('Add/Edit Map', 'ibotpro_musicdb' ) ?>" />  
 		            </p>  
-		            <p>To add another map, simply replace the data in the fields above with the new map data and click the "Add/Edit Map" button.</p> 
+		            <p>To add another Album, simply replace the data in the fields above with the new Album data and click the "Add/Edit Album" button.</p> 
 		        </form>  
 		    </div>
 <?php
 		}
 	} else {
-		$maps = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE . '.id ASC');
+		$albums = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . ' WHERE artistID=' . $_REQUEST['artistID'] . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . '.id ASC');
 ?>
-		<h2><?php _e("Manage Maps", 'ibotpro_musicdb'); ?>
-			<a class="button add-new-h2" href="admin.php?page=ibotpro_musicdb.php&action=add_map"><?php _e("Add New", 'ibotpro_musicdb'); ?></a>
+		<h2><?php _e("Manage Albums", 'ibotpro_musicdb'); ?>
+			<a class="button add-new-h2" href="admin.php?page=ibotpro_musicdb.php&action=add_album"><?php _e("Add New", 'ibotpro_musicdb'); ?></a>
 		</h2>
 <?php
-		if ( !empty($maps)) {
+		if ( !empty($albums)) {
 ?>
 		<table class="wp-list-table widefat" cellspacing="0">
 			<thead>
@@ -194,10 +170,10 @@
 			</thead>
 			<tbody>
 	<?php
-		//loop through the results of all the maps
+		//loop through the results of all the albums
 		$class = '';
 		
-		foreach($maps as $map) {
+		foreach($albums as $album) {
 			//make the rows look nice by alternating the colors of the row.. Prebuilt feature
 			$class = ($class == 'alternate') ? '' : 'alternate';
 			
@@ -205,14 +181,13 @@
 			//output the info into the table.. It will call itelf when they press delete... PHP_SELF
 	?>
 				<tr class="<?php echo $class; ?>">
-					<td class="id"><?php echo $map->id;?></td>
+					<td class="id"><?php echo $album->id;?></td>
 					<td>
-						<?php echo $map->title; ?>
+						<?php echo $album->name; ?>
 						<div class="row-actions">
-							<span class="edit"><a title="Edit &quot;<?php echo $map->title;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=edit_map&amp;mapID=<?php echo $map->id; ?>">Edit</a> | </span>
-							<span class="add_poi"><a title="Manage POIs for &quot;<?php echo $map->title;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=manage_pois&amp;mapID=<?php echo $map->id; ?>">Manage POIs</a> | </span>
-							<span class="trash"><a title="Move &quot;<?php echo $map->title;?>&quot; to the Trash" href="admin.php?page=ibotpro_musicdb.php&amp;action=delete_map&amp;mapID=<?php echo $map->id; ?>" class="submitdelete">Trash</a> | </span>
-							<span class="view"><a rel="permalink" title="View &quot;<?php echo $map->title;?>&quot;" href="<? echo site_url(); ?>/map?mapID=<?php echo $map->id;?>" target="_blank">View</a></span>
+							<span class="edit"><a title="Edit &quot;<?php echo $album->name;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=edit_album&amp;albumID=<?php echo $album->id; ?>">Edit</a> | </span>
+							<span class="trash"><a title="Move &quot;<?php echo $album->name;?>&quot; to the Trash" href="admin.php?page=ibotpro_musicdb.php&amp;action=delete_album&amp;albumID=<?php echo $album->id; ?>" class="submitdelete">Trash</a> | </span>
+							<span class="view"><a rel="permalink" title="View &quot;<?php echo $album->name;?>&quot;" href="<? echo site_url(); ?>/album?albumID=<?php echo $album->id;?>" target="_blank">View</a></span>
 						</div>
 					</td>
 				</tr>
