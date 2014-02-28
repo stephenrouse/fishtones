@@ -2883,3 +2883,4 @@
 [26-Feb-2014 20:58:32 UTC] PHP Notice:  Undefined index: action in /Users/stephenrouse00/Sites/fishtones/v3/wp-content/plugins/ibotpro_musicdb/inc/ibotpro_musicdb_manage_artists.php on line 18
 [26-Feb-2014 20:58:32 UTC] PHP Notice:  Undefined property: stdClass::$imageURI in /Users/stephenrouse00/Sites/fishtones/v3/wp-content/plugins/ibotpro_musicdb/inc/ibotpro_musicdb_manage_artists.php on line 157
 [26-Feb-2014 20:58:32 UTC] PHP Warning:  call_user_func_array() expects parameter 1 to be a valid callback, class 'ibotpro_musicdb' does not have a method 'ibotpro_musicdb_manage_artists' in /Users/stephenrouse00/Sites/fishtones/v3/wp-includes/plugin.php on line 429
+[28-Feb-2014 15:14:57 UTC] PHP Strict Standards:  call_user_func_array() expects parameter 1 to be a valid callback, non-static method ibotpro_mapquestthat::ibotpro_mapquestthat_render_key() should not be called statically in /Users/stephenrouse00/Sites/fishtones/wp-includes/plugin.php on line 429
