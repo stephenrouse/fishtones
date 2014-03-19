@@ -44,8 +44,17 @@ if (!class_exists('ibotpro_musicdb')){
 				$example_artist_name = "NEEDTOBREATHE";
 				$example_artist_url = "http://needtobreathe.net/";
 				$example_artist_approved = "1";
+
+				$artists = array(
+						array("name"=>"NEEDTOBREATHE","url"=>"http://needtobreathe.net/"),
+						array("name"=>"David Crowder Band","url"=>"http://crowdermusic.com/")
+					);
+
+				foreach ($artists as $artist) {
+    				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE, array( 'name' => $artist["name"], 'url' => $artist["url"], 'approved' => "1" ) );
+				}
 				
-				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE, array( 'name' => $example_artist_name, 'url' => $example_artist_url, 'approved' => $example_artist_approved ) );
+				//$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE, array( 'name' => $example_artist_name, 'url' => $example_artist_url, 'approved' => "1" ) );
 			}
 			
 			if ($wpdb->get_var('SHOW TABLES LIKE "' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . '"') != $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE) {
@@ -63,12 +72,22 @@ if (!class_exists('ibotpro_musicdb')){
 				$example_album_name = "The Heat";
 				$example_album_approved = "1";
 				
-				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, array( 'artistID' => $example_artist_id, 'name' => $example_album_name, 'approved' => $example_album_approved ) );
+				$albums = array(
+						array("name"=>"The Heat","artistID"=>"1"),
+						array("name"=>"Remedy","artistID"=>"2")
+					);
+
+				foreach ($albums as $album) {
+    				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, array( 'name' => $album["name"], 'artistID' => $album["artistID"], 'approved' => "1" ) );
+				}
+				
+				//$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, array( 'artistID' => $example_artist_id, 'name' => $example_album_name, 'approved' => $example_album_approved ) );
 			}
 			
 			if ($wpdb->get_var('SHOW TABLES LIKE "' . $wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE . '"') != $wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE) {
 				$sql = 'CREATE TABLE ' . $wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE . ' (
 					id MEDIUMINT(9) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+					albumID MEDIUMINT(9) NOT NULL,
 					name VARCHAR(255) NOT NULL,
 					createDate datetime DEFAULT "0000-00-00 00:00:00" NOT NULL,
 					editDate datetime DEFAULT "0000-00-00 00:00:00" NOT NULL,
@@ -76,10 +95,20 @@ if (!class_exists('ibotpro_musicdb')){
 				
 				dbDelta($sql);
 				
+				$example_album_id = "1";
 				$example_song_name = "More Time";
 				$example_song_approved = "1";
 				
-				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE, array( 'name' => $example_song_name, 'approved' => $example_song_approved ) );
+				$songs = array(
+						array("name"=>"More Time","albumID"=>"1"),
+						array("name"=>"Never Let Go","albumID"=>"2")
+					);
+
+				foreach ($songs as $song) {
+    				$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE, array( 'name' => $song["name"], 'albumID' => $song["albumID"], 'approved' => "1" ) );
+				}
+				
+				//$rows_affected = $wpdb->insert($wpdb->prefix . IBOTPRO_MUSICDB_SONGS_TABLE, array( 'albumID' => $example_artist_id, 'name' => $example_song_name, 'approved' => $example_song_approved ) );
 			}
 			
 			if ($wpdb->get_var('SHOW TABLES LIKE "' . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . '"') != $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE) {
@@ -125,7 +154,7 @@ if (!class_exists('ibotpro_musicdb')){
 		Main functions
 		**************************************************************/
 		function ibotpro_musicdb_manage_music() {
-			if (($_REQUEST['action'] == "manage_songs") || ($_REQUEST['action'] == "edit_song") || ($_REQUEST['action'] == "delete_song")) {
+			if (($_REQUEST['action'] == "manage_songs") || ($_REQUEST['action'] == "edit_song") || ($_REQUEST['action'] == "delete_song") || ($_REQUEST['action'] == "add_song")) {
 				include('inc/ibotpro_musicdb_manage_songs.php');
 			} elseif (($_REQUEST['action'] == "manage_categories") || ($_REQUEST['action'] == "edit_category") || ($_REQUEST['action'] == "delete_category") || ($_REQUEST['action'] == "add_category")) {
 				include('inc/ibotpro_musicdb_manage_categories.php');
@@ -142,6 +171,10 @@ if (!class_exists('ibotpro_musicdb')){
 		
 		function ibotpro_musicdb_manage_songs() {
 			include('inc/ibotpro_musicdb_manage_songs.php');
+		}
+		
+		function ibotpro_musicdb_manage_albums() {
+			include('inc/ibotpro_musicdb_manage_albums.php');
 		}
 
 		function ibotpro_musicdb_render_admin_menu() {  

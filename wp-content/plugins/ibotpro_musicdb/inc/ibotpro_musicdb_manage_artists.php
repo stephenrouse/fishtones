@@ -161,8 +161,8 @@
 						<div class="row-actions">
 							<span class="edit"><a title="Edit &quot;<?php echo $artist->name;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=edit_artist&amp;artistID=<?php echo $artist->id; ?>">Edit</a> | </span>
 							<span class="add_album"><a title="Manage Albums for &quot;<?php echo $artist->name;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=manage_albums&amp;artistID=<?php echo $artist->id; ?>">Manage Albums</a> | </span>
-							<span class="trash"><a title="Move &quot;<?php echo $artist->name;?>&quot; to the Trash" href="admin.php?page=ibotpro_musicdb.php&amp;action=delete_artist&amp;artistID=<?php echo $artist->id; ?>" class="submitdelete">Trash</a>
-							<span class="view"><a rel="permalink" title="View &quot;<?php echo $map->title;?>&quot;" href="<? echo site_url(); ?>/map?mapID=<?php echo $map->id;?>" target="_blank">View</a></span>
+							<span class="trash"><a title="Move &quot;<?php echo $artist->name;?>&quot; to the Trash" href="admin.php?page=ibotpro_musicdb.php&amp;action=delete_artist&amp;artistID=<?php echo $artist->id; ?>" class="submitdelete">Trash</a> | </span>
+							<span class="view"><a rel="permalink" title="View &quot;<?php echo $map->title;?>&quot;" href="<? echo site_url(); ?>/artist?artistID=<?php echo $artist->id;?>" target="_blank">View</a></span>
 						</div>
 					</td>
 				</tr>

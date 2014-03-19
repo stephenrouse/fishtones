@@ -2,8 +2,8 @@
 	define('IBOTPRO_MUSICDB_ARTISTS_TABLE', 'ibotpro_musicdb_artists');
 	define('IBOTPRO_MUSICDB_ALBUMS_TABLE', 'ibotpro_musicdb_albums');
 	define('IBOTPRO_MUSICDB_SONGS_TABLE', 'ibotpro_musicdb_songs');
-	define('IBOTPRO_MUSICDB_CATEGORY_TABLE', 'ibotpro_musicdb_categories');
-	
+	define('IBOTPRO_MUSICDB_CATEGORIES_TABLE', 'ibotpro_musicdb_categories');
+
 	global $wpdb;
 	
 	if (!empty($_REQUEST['action'])) {
@@ -12,7 +12,8 @@
 ?>
 	<style>
 	.id{width:20px;}
-	.icon{width:60px;}
+	ul.categories{overflow:hidden;width:300px;}
+	ul.categories .category{float:left;text-align:center;}
 	</style>
 	<div class="wrap">
 <?php
@@ -20,13 +21,19 @@
 		if ($_POST['musicdb_action'] == 'add_album') {
 			//Form data sent  
 			$name = $_POST['musicdb_album_name']; 
-			$imageURI = $_POST['musicdb_album_imageURI']; 
+			$categoryID = $_POST['musicdb_album_categoryID'];
+			if (isset($_POST['musicdb_album_active'])) {
+				$active = 1;
+			}else{
+				$active = 0;
+			}
 	
 			$wpdb->insert( 
 				$wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, 
 				array( 
 					'name' => stripslashes($name), 
-					'imageURI' => stripslashes($imageURI)
+					'categoryID' => $categoryID, 
+					'active' => $active
 				)
 			);
 	?>
@@ -35,14 +42,20 @@
 		} elseif ($_POST['musicdb_action'] == "edit_album") {
 			//Form data sent  
 			$name = $_POST['musicdb_album_name']; 
-			$imageURI = $_POST['musicdb_album_imageURI']; 
+			$categoryID = $_POST['musicdb_album_categoryID'];
+			if (isset($_POST['musicdb_album_active'])) {
+				$active = 1;
+			}else{
+				$active = 0;
+			}
 			$musicdb_albumID = $_POST['musicdb_albumID'];
 			
 			$wpdb->update( 
 				$wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE, 
 				array( 
 					'name' => stripslashes($name), 
-					'imageURI' => stripslashes($imageURI)
+					'categoryID' => $categoryID,
+					'active' => $active
 				), 
 				array( 'id' => $musicdb_albumID )
 			);
@@ -54,47 +67,33 @@
 			$albums = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . ' WHERE id='.$_REQUEST['albumID']); 
 			
 			$name = $albums[0]->name;
-			$imageURI = $albums[0]->imageURI;
+			$artistID = $albums[0]->artistID;
+			$categoryID = $albums[0]->categoryID;
+			$active = $albums[0]->active;
 			
 			if ($_POST['musicdb_action'] == "delete_album") {
 				//Form data sent  
-				$albumID = $_POST['musicdb_albumID']; 
-			
-				$wpdb->update( 
-					$wpdb->prefix . IBOTPRO_MUSICDB_MAP_TABLE, 
-					array( 
-						'albumID' => 1
-					), 
-					array( 'albumID' => $_POST['musicdb_albumID'] )
-				);
-				
-				$wpdb->update( 
-					$wpdb->prefix . IBOTPRO_MUSICDB_POI_TABLE, 
-					array( 
-						'albumID' => 1
-					), 
-					array( 'albumID' => $_POST['musicdb_albumID'] )
-				);
+				$albumID = $_POST['musicdb_albumID'];
 		
 				//echo "DELETE FROM " . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . " WHERE id=" .$_POST['musicdb_albumID'];
 				$wpdb->query("DELETE FROM " . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . " WHERE id=" .$_POST['musicdb_albumID']);
 				?>  
 				<div class="updated"><p><strong><?php _e('Album deleted.' ); ?></strong></p></div>
-				<p><a href="admin.php?page=ibotpro_musicdb.php&action=manage_albums">Back to albums</a></p>
+				<p><a href="admin.php?page=ibotpro_musicdb.php&action=manage_albums&artistID=<?php echo $artistID ?>">Back to Albums</a></p>
 			<?php
 			} elseif ($_REQUEST['action'] == "delete_album") {
 			?>
 				<h2><?php _e("Manage Albums", 'ibotpro_musicdb'); ?></h2>
 	    		<div class="wrap"> 
 	    			<?php    echo "<h2>" . __( 'Delete Album', 'ibotpro_musicdb' ) . "</h2>"; ?>
-	    			<?php    echo "<p>" . __( 'You are about to delete ', 'ibotpro_musicdb' ) . $name . ".  Are you sure you want to delete this album?</p>"; ?>
+	    			<?php    echo "<p>" . __( 'You are about to delete ', 'ibotpro_musicdb' ) . $name . ".  Are you sure you want to delete this Album?</p>"; ?>
 			        <form name="musicdb_form" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">  
 			            <input type="hidden" name="musicdb_action" value="<? echo $action ?>">
 			            <?php if (($action == 'edit_album') || ($action == 'delete_album')) { ?>
 			            <input type="hidden" name="musicdb_albumID" value="<? echo $_REQUEST['albumID'] ?>">
 			            <?php } ?>
 			            <p class="submit">  
-			            <input type="submit" name="Submit" value="<?php _e('Delete Album', 'ibotpro_musicdb' ) ?>" />  
+			            <input type="submit" name="Submit" value="<?php _e('Add/Edit Album', 'ibotpro_musicdb' ) ?>" />  
 			            </p>
 			        </form>
 	    		</div>
@@ -103,7 +102,6 @@
 		}
 		
 		if ($_REQUEST['action'] != "delete_album") {
-			$artists = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_ARTISTS_TABLE . '.name ASC');
 	?>
 			<h2><?php _e("Manage Albums", 'ibotpro_musicdb'); ?></h2>
 		    <div class="wrap">  
@@ -114,40 +112,51 @@
 		            <?php if ($action == 'edit_album') { ?>
 		            <input type="hidden" name="musicdb_albumID" value="<? echo $_REQUEST['albumID'] ?>">
 		            <?php } ?>
-		            <?php    echo "<h4>" . __( 'Album Details', 'ibotpro_musicdb' ) . "</h4>"; ?>
-		            <p><?php _e("Artist Name: " ); ?>
-		            	<select>
-		            		<option>Select An Artist</option>
-							<?php foreach($artists as $artist) {
-								$selected = "";
-								if ($_REQUEST['artistID']) {
-									if ($artist->id == $_REQUEST['artistID']) {
-										$selected = " selected";
-									}
-								}
-								echo "<option" . $selected . ">" . $artist->name . "</option>";
-		            		} ?>
-		            	</select>
+		            <?php    echo "<h4>" . __( 'Album Details', 'ibotpro_musicdb' ) . "</h4>"; ?>  
+		            <p><?php _e("Album Title: " ); ?><input type="text" name="musicdb_album_name" value="<?php echo stripslashes($name); ?>" size="20"><?php _e(" ex: My Favorite Place" ); ?></p>
+		            <p><?php _e("Category: " ); ?>
+		            <?php
+		            	$categories = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_CATEGORIES_TABLE . '.id ASC');
+		            	
+		            	if (!empty($categories)) {
+		            	?>
+		            	<ul class="categories">
+		            	<?php
+		            		foreach($categories as $category) {
+		            			$category_checked = "";
+		            			if ($category->id == $categoryID) {
+		            				$category_checked = " checked";
+		            			}
+		            ?>
+		            	
+		            		<li class="category">
+		            			<ul class="category-details">
+		            				<li><img src="<?php echo $category->imageURI; ?>"/></li>
+		            				<li><input type="radio" name="musicdb_album_categoryID" value="<?php echo $category->id; ?>"<?php echo $category_checked ?>></li>
+		            			</ul>
+		            		</li>
+		            <?php
+		            		}
+		            ?>
+		            	</ul>
+		            <?php
+						}
+					?>
 		            </p>
-		            <p><?php _e("Album Name: " ); ?><input type="text" name="musicdb_album_name" value="<?php echo $name; ?>" size="20"><?php _e(" ex: Album One" ); ?></p>
-		            <p><?php _e("Album Icon: " ); ?><input type="text" name="musicdb_album_imageURI" value="<?php echo $imageURI; ?>" size="40"></p>
+		            <p><?php _e("Active: " ); ?><input type="checkbox" name="musicdb_album_active" <?php if ($active == 1){ ?>checked<? } ?>></p>
 		            <p class="submit">  
-		            <input type="submit" name="Submit" value="<?php _e('Add/Edit Album', 'ibotpro_musicdb' ) ?>" />  
+		            <input type="submit" name="Submit" value="<?php _e('Add/Edit Map', 'ibotpro_musicdb' ) ?>" />  
 		            </p>  
-		            <p>To add another album, simply replace the data in the fields above with the new album data and click the "Add/Edit Album" button.</p> 
+		            <p>To add another Album, simply replace the data in the fields above with the new Album data and click the "Add/Edit Album" button.</p> 
 		        </form>  
 		    </div>
 <?php
 		}
 	} else {
-		if ($_REQUEST['artistID']) {
-			$albums = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . ' WHERE artistID='. $_REQUEST['artistID'] .' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . '.id ASC');
-		} else {
-			$albums = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . '.id ASC');
-		}
+		$albums = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . ' WHERE artistID=' . $_REQUEST['artistID'] . ' ORDER BY ' . $wpdb->prefix . IBOTPRO_MUSICDB_ALBUMS_TABLE . '.id ASC');
 ?>
 		<h2><?php _e("Manage Albums", 'ibotpro_musicdb'); ?>
-			<a class="button add-new-h2" href="admin.php?page=ibotpro_musicdb.php&action=add_album<?php if ($_REQUEST['artistID']) { echo "&artistID=".$_REQUEST['artistID'];} ?>"><?php _e("Add New", 'ibotpro_musicdb'); ?></a>
+			<a class="button add-new-h2" href="admin.php?page=ibotpro_musicdb.php&action=add_album"><?php _e("Add New", 'ibotpro_musicdb'); ?></a>
 		</h2>
 <?php
 		if ( !empty($albums)) {
@@ -156,8 +165,7 @@
 			<thead>
 				<tr>
 					<th class="id"><?php _e('ID','ibotpro_musicdb') ?></th>
-					<th></th>
-					<th><?php _e('Name','ibotpro_musicdb') ?></th>
+					<th><?php _e('Title','ibotpro_musicdb') ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -174,14 +182,13 @@
 	?>
 				<tr class="<?php echo $class; ?>">
 					<td class="id"><?php echo $album->id;?></td>
-					<td class="icon"><img src="<?php echo $album->imageURI; ?>"/></td>
 					<td>
 						<?php echo $album->name; ?>
 						<div class="row-actions">
 							<span class="edit"><a title="Edit &quot;<?php echo $album->name;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=edit_album&amp;albumID=<?php echo $album->id; ?>">Edit</a> | </span>
 							<span class="add_album"><a title="Manage Songs for &quot;<?php echo $album->name;?>&quot;" href="admin.php?page=ibotpro_musicdb.php&amp;action=manage_songs&amp;albumID=<?php echo $album->id; ?>">Manage Songs</a> | </span>
 							<span class="trash"><a title="Move &quot;<?php echo $album->name;?>&quot; to the Trash" href="admin.php?page=ibotpro_musicdb.php&amp;action=delete_album&amp;albumID=<?php echo $album->id; ?>" class="submitdelete">Trash</a> | </span>
-							<span class="view"><a rel="permalink" title="View &quot;<?php echo $map->title;?>&quot;" href="<? echo site_url(); ?>/album?albumID=<?php echo $album->id;?>" target="_blank">View</a></span>
+							<span class="view"><a rel="permalink" title="View &quot;<?php echo $album->name;?>&quot;" href="<? echo site_url(); ?>/album?albumID=<?php echo $album->id;?>" target="_blank">View</a></span>
 						</div>
 					</td>
 				</tr>
